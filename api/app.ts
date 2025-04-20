@@ -13,11 +13,13 @@ import studentExamRouter from './routes/students/exams';
 import studentResultsRouter from './routes/students/results';
 import studentSubmitRouter from './routes/students/submit';
 
+
+
 dotenv.config();
 const app = express();
 const PORT = 10000;
 const corsOptions: CorsOptions = {
-  origin: 'http://localhost:5000',
+  origin: "*",
 };
 app.use(cors(corsOptions));
 app.use(helmet());
@@ -27,8 +29,9 @@ app.use(
   express.urlencoded({
     extended: true,
   }),
-);
+); 
 
+ 
 const ccpExaminers = buildCCPExaminers();
 const ccpStudents = buildCCPStudents();
 // build an instance of the fabric ca services client based on
@@ -58,7 +61,7 @@ app.listen(PORT, async () => {
   await pool.connect();
   console.log('Database connected');
   console.log(`Listening on port ${PORT}`);
-});
+}); 
 
 export {
   caClientExaminers,
@@ -67,3 +70,5 @@ export {
   ccpStudents,
   pool,
 };
+
+

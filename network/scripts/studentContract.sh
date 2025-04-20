@@ -399,9 +399,11 @@ queryCommitted 2
 ## method defined
 if [ "$CC_INIT_FCN" = "NA" ]; then
   infoln "Chaincode initialization is not required"
+fi
+
 # else
 # chaincodeInvokeInit 1
 # fi
 chaincodeQuery 1
 chaincodeQuery 2
-exit 0;
+exit 0

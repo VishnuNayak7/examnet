@@ -39,14 +39,15 @@
                         type: "application/json",
                     }
                 );
-
+                    console.log("identityExaminers",identityExaminers);
+                    
                 const identityStudentsBlob = new Blob(
                     [JSON.stringify(identityStudents)],
                     {
                         type: "application/json",
                     }
                 );
-
+                    console.log("identityStudentsBlob",identityStudentsBlob)
                 downloadBlob(identityExaminersBlob, "admin_examiners.id");
                 downloadBlob(identityStudentsBlob, "admin_students.id");
             } else {

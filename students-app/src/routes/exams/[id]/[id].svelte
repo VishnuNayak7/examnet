@@ -38,7 +38,7 @@
                         username,
                         password,
                     }),
-                }
+                },
             );
             if (res.ok) {
                 const examRes = (await res.json()).exam;
@@ -55,6 +55,22 @@
                     ExaminerKey: examRes.ExaminerKey,
                 };
                 examStore.set(exam);
+                console.log("exam", exam.Address);
+
+                // const infuraRes = await fetch(
+                //     "https://ipfs.infura.io:5001/api/v0/cat?" +
+                //         new URLSearchParams({
+                //             arg: exam.Address,
+                //         }),
+                //     {
+                //         method: "POST",
+                //     }
+                // );
+                
+            const INFURA_PROJECT_ID = "e427baed8ae44e6ba79e542b53c0a524"; // Get from Infura dashboard
+            const INFURA_PROJECT_SECRET = "537cd59b0e5548f08d24aef38b1d5afa";
+            const auth = "Basic " + btoa(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`);
+
                 const infuraRes = await fetch(
                     "https://ipfs.infura.io:5001/api/v0/cat?" +
                         new URLSearchParams({
@@ -62,12 +78,16 @@
                         }),
                     {
                         method: "POST",
-                    }
+                        headers: {
+                            Authorization: auth, 
+                        },
+                    },
                 );
+
                 if (infuraRes.ok) {
                     const encryptedBlob = await infuraRes.blob();
                     const encryptedBuffer = new Uint8Array(
-                        await encryptedBlob.arrayBuffer()
+                        await encryptedBlob.arrayBuffer(),
                     );
                     var iterations = 10000;
                     var passwordBytes = new TextEncoder().encode(password);
@@ -78,7 +98,7 @@
                         passwordBytes,
                         { name: "PBKDF2" },
                         false,
-                        ["deriveBits"]
+                        ["deriveBits"],
                     );
 
                     let pbkdf2Bytes = await crypto.subtle.deriveBits(
@@ -89,7 +109,7 @@
                             hash: "SHA-256",
                         },
                         passwordKey,
-                        384
+                        384,
                     );
 
                     pbkdf2Bytes = new Uint8Array(pbkdf2Bytes);
@@ -102,7 +122,7 @@
                         keyBytes,
                         { name: "AES-GCM", length: 256 },
                         false,
-                        ["decrypt"]
+                        ["decrypt"],
                     );
 
                     let decryptedBytes = await crypto.subtle.decrypt(
@@ -111,7 +131,7 @@
                             iv: ivBytes,
                         },
                         key,
-                        encryptedBytes
+                        encryptedBytes,
                     );
 
                     decryptedBytes = new Uint8Array(decryptedBytes);
@@ -122,7 +142,7 @@
                     decrypted = true;
                 } else {
                     fireError(
-                        "Couldn't load Exam, check your internet connection"
+                        "Couldn't load Exam, check your internet connection",
                     );
                     decrypted = false;
                 }

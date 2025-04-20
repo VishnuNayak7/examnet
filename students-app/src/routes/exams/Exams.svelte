@@ -33,6 +33,8 @@
                     username,
                 }),
             });
+            console.log("res",res);
+            
             if (res.ok) {
                 const apiRes = await res.json();
                 const examArr: Record<string, any>[] = apiRes.exams;

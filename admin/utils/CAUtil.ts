@@ -81,15 +81,16 @@ const registerUser = async (
       `An identity for the user ${userId} already exists in the wallet`,
     );
   }
+  console.log("passed");
 
   // Must use an admin to register a new user
   const adminIdentity = await wallet.get(adminUserId);
-  console.log(adminUserId);
   if (!adminIdentity) {
     throw new Error(
       'An identity for the admin user does not exist in the wallet',
     );
   }
+  console.log("passed2");
 
   // build a user object for authenticating with the CA
   const provider = wallet
@@ -99,9 +100,12 @@ const registerUser = async (
     adminIdentity,
     adminUserId,
   );
+  console.log("passed3");
 
   // Register the user, enroll the user, and import the new identity into the wallet.
   // if affiliation is specified by client, the affiliation value must be configured in CA
+  console.log("data secret",affiliation,userId,attributes,adminUser);
+  
   const secret = await caClient.register(
     {
       affiliation,
@@ -111,12 +115,26 @@ const registerUser = async (
       maxEnrollments: 1,
     },
     adminUser,
-  );
+  ).catch(err => {
+    console.error('Detailed CA registration error:', {
+      message: err.message,
+      stack: err.stack,
+      response: err.response?.body,
+      statusCode: err.response?.statusCode
+    });
+    throw err;
+  });
+
+  console.log("passed4", secret);
+
 
   console.log(
     `Successfully registered user ${userId}`,
   );
   return secret;
 };
+
+
+
 
 export { buildCAClient, enrollAdmin, registerUser };

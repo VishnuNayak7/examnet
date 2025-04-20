@@ -77,8 +77,10 @@ const sendMail = async (
 ) => {
   if (req.body.identity && req.body.username) {
     try {
+      console.log("body in appuits",req.body);
+      
       const mail: Mail.Options = {
-        from: 'ExamNet <harshhsharma23@gmail.com>',
+        from: 'lovachakravarthi@gmail.com',
         to: username,
         subject: 'Enrollment Secret',
         text: `Hello ${name}, Your enrollment secret is: ${secret}`,

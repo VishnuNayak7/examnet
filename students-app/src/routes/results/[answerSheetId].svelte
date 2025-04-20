@@ -41,6 +41,12 @@
                 const apiRes = await res.json();
                 result = apiRes.result;
                 signature = result.Signature;
+                const INFURA_PROJECT_ID = "e427baed8ae44e6ba79e542b53c0a524"; // Get from Infura dashboard
+                const INFURA_PROJECT_SECRET = "537cd59b0e5548f08d24aef38b1d5afa";
+            const auth =
+                "Basic " +
+                btoa(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`);
+
                 const infuraRes = await fetch(
                     "https://ipfs.infura.io:5001/api/v0/cat?" +
                         new URLSearchParams({
@@ -48,6 +54,9 @@
                         }),
                     {
                         method: "POST",
+                        headers: {
+                            Authorization: auth,
+                        },
                     }
                 );
                 if (infuraRes.ok) {

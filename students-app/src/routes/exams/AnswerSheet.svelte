@@ -56,7 +56,7 @@
                 passwordBytes,
                 { name: "PBKDF2" },
                 false,
-                ["deriveBits"]
+                ["deriveBits"],
             );
 
             let pbkdf2DerivedBytes: ArrayBuffer =
@@ -68,7 +68,7 @@
                         hash: "SHA-256",
                     },
                     passwordKey,
-                    384
+                    384,
                 );
 
             pbkdf2DerivedBytes = new Uint8Array(pbkdf2DerivedBytes);
@@ -81,13 +81,13 @@
                 keyBytes,
                 { name: "AES-GCM", length: 256 },
                 false,
-                ["encrypt"]
+                ["encrypt"],
             );
 
             let encryptedBytes: any = await crypto.subtle.encrypt(
                 { name: "AES-GCM", iv: ivBytes },
                 encryptionKey,
-                paperBuffer
+                paperBuffer,
             );
 
             encryptedBytes = new Uint8Array(encryptedBytes);
@@ -104,17 +104,28 @@
             body.append(
                 paper[0].name,
                 new Blob([encryptedFile]),
-                paper[0].name
+                paper[0].name,
             );
+            const INFURA_PROJECT_ID = "e427baed8ae44e6ba79e542b53c0a524"; // Get from Infura dashboard
+            const INFURA_PROJECT_SECRET = "537cd59b0e5548f08d24aef38b1d5afa";
+            const auth =
+                "Basic " +
+                btoa(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`);
 
             const infuraRes = await fetch(
                 "https://ipfs.infura.io:5001/api/v0/add?quieter=true",
                 {
                     method: "POST",
+                    headers: {
+                        Authorization: auth,
+                    },
                     body,
-                }
+                },
             );
+
             if (infuraRes.ok) {
+                console.log("infuraRes", infuraRes);
+                
                 const infuraRef = await infuraRes.json();
                 const res = await fetch(
                     `http://localhost:10000/students/submit/${examId}`,
@@ -130,7 +141,7 @@
                             examId,
                             address: infuraRef.Hash,
                         }),
-                    }
+                    },
                 );
                 if (res.ok) {
                     Swal.fire({
@@ -144,7 +155,7 @@
                 }
             } else {
                 fireError(
-                    "Couldn't submit answer sheet. Please check your connection"
+                    "Couldn't submit answer sheet. Please check your connection",
                 );
             }
         } catch (err) {

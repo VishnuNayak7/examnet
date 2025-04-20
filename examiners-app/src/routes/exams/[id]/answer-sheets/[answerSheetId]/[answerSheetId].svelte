@@ -28,6 +28,12 @@
     onMount(async () => {
         isLoading = true;
         try {
+            const INFURA_PROJECT_ID = "e427baed8ae44e6ba79e542b53c0a524"; // Get from Infura dashboard
+            const INFURA_PROJECT_SECRET = "537cd59b0e5548f08d24aef38b1d5afa";
+            const auth =
+                "Basic " +
+                btoa(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`);
+
             const infuraRes = await fetch(
                 "https://ipfs.infura.io:5001/api/v0/cat?" +
                     new URLSearchParams({
@@ -35,12 +41,15 @@
                     }),
                 {
                     method: "POST",
-                }
+                    headers: {
+                        Authorization: auth,
+                    },
+                },
             );
             if (infuraRes.ok) {
                 const encryptedBlob = await infuraRes.blob();
                 const encryptedBuffer = new Uint8Array(
-                    await encryptedBlob.arrayBuffer()
+                    await encryptedBlob.arrayBuffer(),
                 );
                 var iterations = 10000;
                 const pKey = pki.privateKeyFromPem(privateKey);
@@ -53,7 +62,7 @@
                     passwordBytes,
                     { name: "PBKDF2" },
                     false,
-                    ["deriveBits"]
+                    ["deriveBits"],
                 );
 
                 let pbkdf2Bytes = await crypto.subtle.deriveBits(
@@ -64,7 +73,7 @@
                         hash: "SHA-256",
                     },
                     passwordKey,
-                    384
+                    384,
                 );
 
                 pbkdf2Bytes = new Uint8Array(pbkdf2Bytes);
@@ -77,7 +86,7 @@
                     keyBytes,
                     { name: "AES-GCM", length: 256 },
                     false,
-                    ["decrypt"]
+                    ["decrypt"],
                 );
 
                 let decryptedBytes = await crypto.subtle.decrypt(
@@ -86,7 +95,7 @@
                         iv: ivBytes,
                     },
                     key,
-                    encryptedBytes
+                    encryptedBytes,
                 );
 
                 decryptedBytes = new Uint8Array(decryptedBytes);
@@ -129,8 +138,8 @@
                 const examinerPrivateKey = pki.privateKeyFromPem(privateKey);
 
                 const digest = md.sha512.create();
-                console.log(paper)
-                console.log(paper[0])
+                console.log(paper);
+                console.log(paper[0]);
                 const paperString = await paper.text();
                 digest.update(paperString);
 
@@ -139,12 +148,21 @@
                 const body = new FormData();
                 body.append(paper.name, paper, paper.name);
 
+                const INFURA_PROJECT_ID = "e427baed8ae44e6ba79e542b53c0a524"; // Get from Infura dashboard
+                const INFURA_PROJECT_SECRET = "537cd59b0e5548f08d24aef38b1d5afa";
+                const auth =
+                    "Basic " +
+                    btoa(`${INFURA_PROJECT_ID}:${INFURA_PROJECT_SECRET}`);
+
                 const infuraRes = await fetch(
                     "https://ipfs.infura.io:5001/api/v0/add?quieter=true",
                     {
                         method: "POST",
                         body,
-                    }
+                        headers: {
+                            Authorization: auth,
+                        },
+                    },
                 );
 
                 const infuraRef = await infuraRes.json();
@@ -161,7 +179,7 @@
                             username,
                             id: identityString,
                         }),
-                    }
+                    },
                 );
                 if (res.ok) {
                     Swal.fire({
@@ -171,7 +189,7 @@
                     });
                 } else
                     fireError(
-                        `Could not publish result: ${(await res.json()).error}`
+                        `Could not publish result: ${(await res.json()).error}`,
                     );
             } else {
                 fireError("You must choose a PDF file");

@@ -6,26 +6,58 @@ const examinersMspId = 'ExaminersMSP';
 const studentsMspId = 'StudentsMSP';
 
 const enrollExaminers = async (req: Request, res: Response) => {
-  const { name, username, secret }: { name: string, username: string; secret: string } = req.body;
-  if (name && username && secret) {
-    const exists = await pool.query('SELECT * FROM examiners WHERE email = $1', [username]);
-    if (!exists.rowCount) {
-      console.log('does not exist');
-      await issueIdentity(res, username, secret, caClientExaminers, examinersMspId, [
-        {
-          name: 'Name',
-          optional: false,
-        },
-        {
-          name: 'Email',
-          optional: false,
-        },
-      ]);
-      return pool.query('INSERT INTO examiners VALUES($1, $2)', [username, name]);
-    }
-    return res.status(409).json({ error: 'Examiner already enrolled' });
+  const { name, username, secret } = req.body;
+
+  // Validate input
+  if (!name || !username || !secret) {
+    return res.status(400).json({ error: 'Name, username and secret are required' });
   }
-  return res.status(401).json({ error: 'Name, username and secret are required' });
+
+  try {
+    // Check if examiner exists
+    const { rowCount } = await pool.query(
+      'SELECT 1 FROM examiners WHERE email = $1', 
+      [username]
+    );
+
+    if (rowCount > 0) {
+      return res.status(409).json({ error: 'Examiner already enrolled' });
+    }
+
+    // Issue identity (modified to return instead of respond)
+    const identity = await issueIdentity(
+      res,
+      username, 
+      secret, 
+      caClientExaminers, 
+      examinersMspId, 
+      [
+        { name: 'Name', optional: false },
+        { name: 'Email', optional: false }
+      ]
+    );
+
+    // Insert into database
+    await pool.query(
+      'INSERT INTO examiners (email, name) VALUES ($1, $2)',
+      [username, name]
+    );
+
+    // Send single response
+    return res.status(201).json({ 
+      success: true,
+      message: 'Successfully enrolled examiner',
+      username,
+      name
+    });
+
+  } catch (error) {
+    console.error('Enrollment error:', error);
+    return res.status(500).json({ 
+      error: 'Enrollment failed',
+      details: error.message 
+    });
+  }
 };
 
 const enrollStudents = async (req: Request, res: Response) => {

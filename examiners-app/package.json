@@ -29,9 +29,11 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.3.3",
     "autoprefixer": "^9.8.6",
+    "btoa": "^1.2.1",
     "node-forge": "^0.10.0",
     "postcss": "^7.0.36",
     "sirv-cli": "^1.0.12",
+    "stream-browserify": "^3.0.0",
     "svelte-navigator": "^3.1.5",
     "sweetalert2": "^11.0.18",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.2"

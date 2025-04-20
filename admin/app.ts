@@ -8,6 +8,8 @@ import indexRouter from './routes';
 import registerRouter from './routes/register';
 import { buildCAClient } from './utils/CAUtil';
 import { buildCCPExaminers, buildCCPStudents } from './utils/AppUtil';
+ 
+
 
 dotenv.config();
 const app = express();
@@ -42,7 +44,7 @@ const caClientStudents = buildCAClient(
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
+  port: 465, 
   secure: true,
   auth: {
     type: 'OAuth2',
@@ -53,18 +55,18 @@ const transporter = nodemailer.createTransport({
     accessToken: process.env.OAUTH_ACCESS_TOKEN,
   },
 });
-
+ 
 app.use('/register', registerRouter);
 app.use('/', indexRouter);
 app.get('*', (req: Request, res: Response) => res.status(404).json({ error: 'Does not exist' }));
-
+ 
 app.listen(PORT, async () => {
   await storage.init({
     dir: './wallet',
     stringify: JSON.stringify,
     parse: JSON.parse,
     encoding: 'utf8',
-    logging: false,
+    logging: false, 
     expiredInterval: 2 * 60 * 1000,
     forgiveParseErrors: false,
   });
@@ -74,3 +76,5 @@ app.listen(PORT, async () => {
 export {
   caClientExaminers, caClientStudents, mspExaminers, mspStudents, transporter,
 };
+
+

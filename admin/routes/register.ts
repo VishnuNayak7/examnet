@@ -6,3 +6,5 @@ registerRouter.post('/examiners', registerExaminer);
 registerRouter.post('/students', registerStudents);
 
 export default registerRouter;
+
+
